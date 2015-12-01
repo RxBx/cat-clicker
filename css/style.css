@@ -1,16 +1,17 @@
-img {
-	width: 50%;
-}
 
-@media screen and (max-width: 350px) {
-    img {
-        width: 100%;
-    }
-}
 
 p {
 	display: inline;
 }
+
+img {
+	width: 100%;
+}
+
+.col-half {
+	width: 50%;
+	float: left;
+	}
 
 .center {
 	text-align: center;
