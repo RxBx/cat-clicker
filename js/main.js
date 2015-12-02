@@ -1,16 +1,15 @@
-
 //Create Cat prototype
 var Cat = function(name, imageURL) {
-	var obj = Object.create(Cat.prototype);
-	obj.score = 0;
-	obj.name = name;
-	obj.imageURL = imageURL;
-	return obj;
+    var obj = Object.create(Cat.prototype);
+    obj.score = 0;
+    obj.name = name;
+    obj.imageURL = imageURL;
+    return obj;
 };
 
 Cat.prototype.scorer = function() {
-	this.score += 1;
-	//document.getElementById(this.name + "Score").textContent = this.score;
+    this.score += 1;
+    //document.getElementById(this.name + "Score").textContent = this.score;
 }
 
 /*var giveName = function(variable) {
@@ -21,8 +20,58 @@ Cat.prototype.scorer = function() {
   }
 }*/
 
-var cat1 = Cat("Tommy", "images/cat1.jpg");
+var allCats = [];
 
+var catNames = ['Jerry', 'George', 'Elaine', 'Kramer', 'Larry'];
+
+for (i = 0; i < 5; i++) {
+    var catImageURL = 'images/cat' + (i + 1) + '.jpg';
+    nextCat = Cat(catNames[i], catImageURL);
+    allCats.push(nextCat);
+}
+
+var catListHTML = document.getElementById('catList');
+
+
+var catURL = document.getElementById('catURL');
+var catScore = document.getElementById('catScore');
+
+var currentCat;
+
+catURL.addEventListener('click', function() {
+    currentCat.score += 1;
+    catScore.textContent = currentCat.score;
+}, false);
+
+var load = function(catNumber) {
+    currentCat = allCats[catNumber];
+    var catName = document.getElementById('catName');
+    catName.textContent = currentCat.name;
+
+    catScore.textContent = currentCat.score;
+    catURL.src = currentCat.imageURL;
+}
+
+for (i = 0; i < 5; i++) {
+    console.log(allCats[i].name + ' and ' + allCats[i].imageURL);
+    var nextCatListItem = document.createElement('li');
+    nextCatListItem.textContent = allCats[i].name;
+    catListHTML.appendChild(nextCatListItem);
+    currentChild = catListHTML.lastChild;
+    currentChild.addEventListener('click', (function(iCopy) {
+        return function() {
+            load(iCopy);
+        };
+    })(i));
+};
+
+/*
+
+
+*/
+
+
+/*
 var cat1NameHTML = document.getElementById('cat1Name');
 
 cat1NameHTML.textContent = cat1.name;
