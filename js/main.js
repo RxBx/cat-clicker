@@ -4,6 +4,7 @@ var Cat = function(name, imageURL) {
     obj.score = 0;
     obj.name = name;
     obj.imageURL = imageURL;
+    obj.idNumber;
     return obj;
 };
 
@@ -39,30 +40,35 @@ var catScore = document.getElementById('catScore');
 var currentCat;
 
 catURL.addEventListener('click', function() {
-    currentCat.score += 1;
+    currentCat.scorer();
     catScore.textContent = currentCat.score;
 }, false);
 
-var load = function(catNumber) {
-    currentCat = allCats[catNumber];
-    var catName = document.getElementById('catName');
-    catName.textContent = currentCat.name;
+var load = function(catName) {
+	//console.log(catName);
+	for (i=0; i<5; i++) {
+		if (allCats[i].name === catName) {
+			currentCat = allCats[i];
+    		var catName = document.getElementById('catName');
+    		catName.textContent = currentCat.name;
+    		catScore.textContent = currentCat.score;
+    		catURL.src = currentCat.imageURL;
+    	}
 
-    catScore.textContent = currentCat.score;
-    catURL.src = currentCat.imageURL;
+	}
 }
 
 for (i = 0; i < 5; i++) {
     console.log(allCats[i].name + ' and ' + allCats[i].imageURL);
+    currentCat = allCats[i];
+    currentCat.idNumber = i;
     var nextCatListItem = document.createElement('li');
-    nextCatListItem.textContent = allCats[i].name;
+    nextCatListItem.textContent = currentCat.name;
     catListHTML.appendChild(nextCatListItem);
     currentChild = catListHTML.lastChild;
-    currentChild.addEventListener('click', (function(iCopy) {
-        return function() {
-            load(iCopy);
-        };
-    })(i));
+    currentChild.addEventListener('click', function(e) {
+            load(this.textContent);
+        });
 };
 
 /*
