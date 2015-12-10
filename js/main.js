@@ -12,7 +12,7 @@ var model = {
             obj.score = 0;
             obj.name = name;
             obj.imageURL = imageURL;
-            obj.idNumber;
+            //obj.idNumber;
             return obj;
         };
 
@@ -33,7 +33,7 @@ var model = {
     }
 
 
-}
+};
 
 
 var octopus = {
@@ -41,20 +41,30 @@ var octopus = {
     init: function() {
         model.init(); // make the cat array
 
-        for (i = 0; i < model.allCats.length; i++) {
-            console.log(model.allCats[i].name + ' and ' + model.allCats[i].imageURL);
+        model.currentCat = model.allCats[0];
 
-            view.listItemMaker(model.allCats[i]); // make the DOM list items
-        };
+        viewList.init(); // create the first list
 
         view.init(); //attaches the scoring function to the image
 
     },
 
+    getAllCats: function() {
+        return model.allCats;
+    },
+
+    getCurrentCat: function() {
+        return model.currentCat;
+    },
+
+    setCurrentCat: function(catObject) {
+        model.currentCat = catObject;
+    },
+
     scoreAdvance: function() {
         model.currentCat.scorer();
         //console.log("scoreAdvance " + model.currentCat.score);
-        return model.currentCat.score;
+        //return model.currentCat.score;
     },
 
     load: function(catName) {
@@ -66,24 +76,19 @@ var octopus = {
             }
         }
     }
-}
+};
 
-
-
-var view = {
+var viewList = {
 
     catListHTML: document.getElementById('catList'),
-    catURL: document.getElementById('catURL'),
-    catScoreHTML: document.getElementById('catScore'),
-    catNameHTML: document.getElementById('catName'),
 
-    init: function() { //attaches the score function to picture clicks
-        this.catURL.addEventListener('click', function() {
-            var updatedScore = octopus.scoreAdvance();
-            //console.log("view " + updatedScore);
-            //console.log(this);
-            view.catScoreHTML.textContent = updatedScore;
-        }, false)
+    init: function() {
+        var allTheCats = octopus.getAllCats();
+        for (i = 0; i < allTheCats.length; i++) {
+            console.log(allTheCats[i].name + ' and ' + allTheCats[i].imageURL);
+
+            this.listItemMaker(allTheCats[i]); // make the DOM list items
+        }
     },
 
     listItemMaker: function(catObject) {
@@ -91,18 +96,41 @@ var view = {
         nextCatListItem.textContent = catObject.name; //VIEW
         this.catListHTML.appendChild(nextCatListItem); // VIEW
         currentChild = this.catListHTML.lastChild; // VIEW
-        currentChild.addEventListener('click', function(e) { //VIEW
-            octopus.load(this.textContent);
-        });
+        currentChild.addEventListener('click', (function(catObjectCopy) {
+                return function() {
+                    octopus.setCurrentCat(catObjectCopy);
+                    view.render();
+                };
+            })(catObject));
+        view.render();
+    }
+};
+
+
+var view = {
+
+    catURL: document.getElementById('catURL'),
+    catScoreHTML: document.getElementById('catScore'),
+    catNameHTML: document.getElementById('catName'),
+
+    init: function() { //attaches the score function to picture clicks
+        this.catURL.addEventListener('click', function() {
+            octopus.scoreAdvance();
+            //console.log("view " + updatedScore);
+            //console.log(this);
+            //view.catScoreHTML.textContent = updatedScore;
+            view.render();
+        }, false);
     },
 
-    renderCat: function(catObject) {
+    render: function() {
         //VIEW
+        var catObject = octopus.getCurrentCat();
         this.catNameHTML.textContent = catObject.name; //VIEW
         this.catScoreHTML.textContent = catObject.score; //VIEW
         this.catURL.src = catObject.imageURL; //VIEW
     }
-}
+};
 
 octopus.init();
 
