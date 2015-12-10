@@ -1,5 +1,7 @@
 var model = {
 
+    admin: false,
+
     allCats: [], // array for all cats
 
     currentCat: {}, // will hold the currently selected object for loading & scoring
@@ -19,7 +21,7 @@ var model = {
         Cat.prototype.scorer = function() {
             this.score += 1;
             //document.getElementById(this.name + "Score").textContent = this.score;
-        }
+        };
 
         // loop to create cat objects based on list of cat names
         for (i = 0; i < this.catNames.length; i++) {
@@ -32,9 +34,7 @@ var model = {
 
     }
 
-
 };
-
 
 var octopus = {
 
@@ -46,6 +46,8 @@ var octopus = {
         viewList.init(); // create the first list
 
         view.init(); //attaches the scoring function to the image
+
+        viewAdmin.init();
 
     },
 
@@ -75,34 +77,49 @@ var octopus = {
                 view.renderCat(model.currentCat);
             }
         }
+    },
+
+    setAdmin: function(boolean) {
+        model.admin = boolean;
+    },
+
+    getAdmin: function() {
+        return model.admin;
+    },
+
+    update: function() {
+        var updateName = viewAdmin.formNameHTML.value;
+        var updateURL = viewAdmin.formURLHTML.value;
+        var updateScore = parseInt(viewAdmin.formClicksHTML.value, 10);
+        model.currentCat.name = updateName;
+        model.currentCat.imageURL = updateURL;
+        model.currentCat.score = updateScore;
     }
 };
 
 var viewList = {
 
-    catListHTML: document.getElementById('catList'),
-
     init: function() {
-        var allTheCats = octopus.getAllCats();
-        for (i = 0; i < allTheCats.length; i++) {
-            console.log(allTheCats[i].name + ' and ' + allTheCats[i].imageURL);
-
-            this.listItemMaker(allTheCats[i]); // make the DOM list items
-        }
+        this.catListHTML = document.getElementById('catList');
+        this.render();
     },
 
-    listItemMaker: function(catObject) {
-        var nextCatListItem = document.createElement('li'); // VIEW
-        nextCatListItem.textContent = catObject.name; //VIEW
-        this.catListHTML.appendChild(nextCatListItem); // VIEW
-        currentChild = this.catListHTML.lastChild; // VIEW
-        currentChild.addEventListener('click', (function(catObjectCopy) {
+    render: function() {
+        this.catListHTML.innerHTML = '';
+        var allTheCats = octopus.getAllCats();
+        for (i = 0; i < allTheCats.length; i++) {
+
+            var nextCatListItem = document.createElement('li'); // VIEW
+            nextCatListItem.textContent = allTheCats[i].name; //VIEW
+            this.catListHTML.appendChild(nextCatListItem); // VIEW
+            currentChild = this.catListHTML.lastChild; // VIEW
+            currentChild.addEventListener('click', (function(catObjectCopy) {
                 return function() {
                     octopus.setCurrentCat(catObjectCopy);
                     view.render();
                 };
-            })(catObject));
-        view.render();
+            })(allTheCats[i]));
+        }
     }
 };
 
@@ -121,6 +138,7 @@ var view = {
             //view.catScoreHTML.textContent = updatedScore;
             view.render();
         }, false);
+        this.render();
     },
 
     render: function() {
@@ -132,79 +150,52 @@ var view = {
     }
 };
 
-octopus.init();
+var viewAdmin = {
 
-//Create Cat prototype
+    adminHTML: document.getElementById('admin'),
+    adminButtonHTML: document.getElementById('adminButton'),
+    adminFormHTML: document.getElementById('adminForm'),
+    formNameHTML: document.getElementById('formName'),
+    formURLHTML: document.getElementById('formURL'),
+    formClicksHTML: document.getElementById('formClicks'),
+    cancelButtonHTML: document.getElementById('cancelButton'),
+    saveButtonHTML: document.getElementById('saveButton'),
 
-/*var giveName = function(variable) {
-  for (var prop in this) {
-    if (variable === this[prop]) {
-      return prop;
+    init: function() {
+        this.adminButtonHTML.addEventListener('click', function() {
+            octopus.setAdmin(true);
+            viewAdmin.render();
+        }, false);
+
+        this.cancelButtonHTML.addEventListener('click', function() {
+            octopus.setAdmin(false);
+            viewAdmin.render();
+        }, false);
+
+        this.saveButtonHTML.addEventListener('click', function() {
+            octopus.update();
+            octopus.setAdmin(false);
+            viewList.render();
+            view.render();
+            viewAdmin.render();
+        }, false);
+
+        viewAdmin.render();
+    },
+
+    render: function() {
+        var currentCat = octopus.getCurrentCat();
+        this.formNameHTML.value = currentCat.name;
+        this.formURLHTML.value = currentCat.imageURL;
+        this.formClicksHTML.value = currentCat.score;
+
+        if (octopus.getAdmin() === false) {
+            this.adminFormHTML.style.display = 'none';
+        } else {
+            this.adminFormHTML.style.display = 'block';
+        }
     }
-  }
-}*/
 
+};
 
-
-
-
-
-
-
-/*
-
-
-*/
-
-
-/*
-var cat1NameHTML = document.getElementById('cat1Name');
-
-cat1NameHTML.textContent = cat1.name;
-
-var cat1ScoreHTML = document.getElementById('cat1Score');
-
-cat1ScoreHTML.textContent = cat1.score;
-
-var cat1URLHTML = document.getElementById('cat1URL');
-
-cat1URLHTML.src = cat1.imageURL;
-
-cat1URLHTML.addEventListener('click', function(e) {
-    cat1.scorer();
-    cat1ScoreHTML.textContent = cat1.score;
-}, false);
-
-
-var cat2 = Cat("Joey", "images/cat2.jpg");
-
-var cat2NameHTML = document.getElementById('cat2Name');
-
-cat2NameHTML.textContent = cat2.name;
-
-var cat2ScoreHTML = document.getElementById('cat2Score');
-
-cat2ScoreHTML.textContent = cat2.score;
-
-var cat2URLHTML = document.getElementById('cat2URL');
-
-cat2URLHTML.src = cat2.imageURL;
-
-cat2URLHTML.addEventListener('click', function(e) {
-    cat2.scorer();
-    cat2ScoreHTML.textContent = cat2.score;
-}, false);
-
-/* Original Code
-var score = 0;
-
-document.getElementById("score").textContent = score;
-
-var cat = document.getElementById("cat");
-
-cat.addEventListener("click", function(e) {
-    score += 1;
-    document.getElementById("score").textContent = score;
-    e.preventDefault();
-    e.stopPropagation();
-}, false);*/
+octopus.init();
